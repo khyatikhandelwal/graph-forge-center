@@ -3,14 +3,6 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
 const Navigation = () => {
   const location = useLocation();
@@ -33,8 +25,8 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <div className="text-2xl font-bold text-gray-900">
-                Black Box Scan
+              <div className="text-2xl font-bold text-gray-900 font-inter">
+                BlackBoxScan
               </div>
             </Link>
           </div>
@@ -47,8 +39,8 @@ const Navigation = () => {
                 to={item.path}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive(item.path)
-                    ? "text-blue-600 bg-blue-50"
-                    : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    ? "text-green-600 bg-green-50"
+                    : "text-gray-700 hover:text-green-600 hover:bg-gray-50"
                 }`}
               >
                 {item.name}
@@ -91,8 +83,8 @@ const Navigation = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                     isActive(item.path)
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                      ? "text-green-600 bg-green-50"
+                      : "text-gray-700 hover:text-green-600 hover:bg-gray-50"
                   }`}
                 >
                   {item.name}
@@ -102,7 +94,7 @@ const Navigation = () => {
                 href="https://github.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block px-3 py-2 text-gray-700 hover:text-blue-600 flex items-center gap-2"
+                className="block px-3 py-2 text-gray-700 hover:text-green-600 flex items-center gap-2"
               >
                 <Github size={16} />
                 GitHub
