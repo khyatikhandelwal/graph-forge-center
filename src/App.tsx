@@ -9,6 +9,7 @@ import About from "./pages/About";
 import Documentation from "./pages/Documentation";
 import Demo from "./pages/Demo";
 import Contribute from "./pages/Contribute";
+import Resources from "./pages/Resources";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
+          <Route path="/resources" element={<Resources />} />
           <Route path="/docs" element={<Documentation />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/contribute" element={<Contribute />} />
