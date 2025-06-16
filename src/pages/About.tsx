@@ -1,9 +1,47 @@
 
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const About = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+
+  const { toast } = useToast();
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Here you would normally send the data to your API
+    console.log("Contact form submitted:", formData);
+    
+    toast({
+      title: "Message Sent!",
+      description: "Thank you for contacting us. We'll get back to you soon.",
+    });
+
+    // Reset form
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: ""
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
@@ -72,6 +110,100 @@ const About = () => {
                   All our code, documentation, and resources are freely available under permissive licenses, 
                   ensuring that our tools remain accessible and can be built upon by the global community.
                 </p>
+              </CardContent>
+            </Card>
+
+            {/* Contact Form Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Us</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Name *
+                      </label>
+                      <Input
+                        value={formData.name}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        placeholder="Your full name"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email *
+                      </label>
+                      <Input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        placeholder="your.email@example.com"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Subject *
+                    </label>
+                    <Input
+                      value={formData.subject}
+                      onChange={(e) => handleInputChange("subject", e.target.value)}
+                      placeholder="What is this about?"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Message *
+                    </label>
+                    <Textarea
+                      value={formData.message}
+                      onChange={(e) => handleInputChange("message", e.target.value)}
+                      placeholder="Tell us more about your inquiry..."
+                      rows={6}
+                      required
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full">
+                    Send Message
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* FAQ Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Frequently Asked Questions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">How can I contribute?</h4>
+                  <p className="text-sm text-gray-600">
+                    Visit our Contribute page to submit research papers, datasets, or code contributions.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">Is the software free to use?</h4>
+                  <p className="text-sm text-gray-600">
+                    Yes, BlackBoxScan is completely open-source and free for both academic and commercial use.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">How do I report a bug?</h4>
+                  <p className="text-sm text-gray-600">
+                    Please use our GitHub issues page or contact our technical support team directly.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
