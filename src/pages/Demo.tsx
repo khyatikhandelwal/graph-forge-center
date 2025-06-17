@@ -7,104 +7,96 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const Demo = () => {
   const [selectedFunction, setSelectedFunction] = useState("");
   const [inputText, setInputText] = useState("");
+  const [kValue, setKValue] = useState("5");
+  const [model, setModel] = useState("gpt2");
+  const [words, setWords] = useState("");
+  const [includePlot, setIncludePlot] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const demoFunctions = [
-    { value: "vulnerability_scan", label: "Vulnerability Scanning" },
-    { value: "performance_analysis", label: "Performance Analysis" },
-    { value: "security_audit", label: "Security Audit" },
-    { value: "network_mapping", label: "Network Mapping" },
-    { value: "threat_detection", label: "Threat Detection" },
+    { value: "sentence_likelihood", label: "Sentence Likelihood Analysis" },
+    { value: "top_k_tokens", label: "Top-K Token Prediction" },
+    { value: "embeddings", label: "Word Embeddings" },
+    { value: "attention", label: "Attention Analysis" },
+    { value: "attention_visualize", label: "Attention Visualization" },
   ];
-
-  // Mock data for different demo types
-  const mockData = {
-    vulnerability_scan: {
-      type: "chart",
-      data: [
-        { name: "Critical", count: 3, severity: 100 },
-        { name: "High", count: 7, severity: 80 },
-        { name: "Medium", count: 12, severity: 60 },
-        { name: "Low", count: 18, severity: 40 },
-        { name: "Info", count: 25, severity: 20 },
-      ],
-      summary: "Found 65 total vulnerabilities across 5 severity levels."
-    },
-    performance_analysis: {
-      type: "line_chart",
-      data: [
-        { time: "00:00", cpu: 45, memory: 62, network: 23 },
-        { time: "00:05", cpu: 52, memory: 58, network: 31 },
-        { time: "00:10", cpu: 48, memory: 65, network: 28 },
-        { time: "00:15", cpu: 61, memory: 71, network: 42 },
-        { time: "00:20", cpu: 55, memory: 68, network: 38 },
-        { time: "00:25", cpu: 49, memory: 63, network: 25 },
-      ],
-      summary: "System performance analysis shows average CPU usage of 52% with memory consumption at 64%."
-    },
-    security_audit: {
-      type: "text",
-      data: `Security Audit Report:
-
-✅ PASSED: SSL/TLS Configuration
-✅ PASSED: Authentication Mechanisms  
-⚠️  WARNING: Session Management - Consider implementing stricter timeout policies
-❌ FAILED: Input Validation - Multiple injection vulnerabilities detected
-✅ PASSED: Access Controls
-⚠️  WARNING: Logging and Monitoring - Insufficient log retention period
-
-Score: 7/10 - Good security posture with room for improvement`,
-      summary: "Security audit completed with a score of 7/10."
-    },
-    network_mapping: {
-      type: "text",
-      data: `Network Topology Discovery:
-
-📍 Gateway: 192.168.1.1 (Router/Firewall)
-├── 192.168.1.10 (Web Server) - Apache 2.4.41
-├── 192.168.1.20 (Database Server) - MySQL 8.0
-├── 192.168.1.30 (File Server) - Samba 4.15
-├── 192.168.1.40 (DNS Server) - BIND 9.16
-└── 192.168.1.100-150 (DHCP Range) - 12 active hosts
-
-🔍 Open Ports Summary:
-- Port 80/443: HTTP/HTTPS (Web Server)
-- Port 3306: MySQL (Database)
-- Port 445: SMB (File Server)
-- Port 53: DNS
-
-⚡ Network Performance: 98.5% uptime, avg latency 12ms`,
-      summary: "Discovered 16 active hosts with 4 critical services identified."
-    },
-    threat_detection: {
-      type: "chart",
-      data: [
-        { name: "Malware", detected: 12, blocked: 11 },
-        { name: "Phishing", detected: 8, blocked: 8 },
-        { name: "Intrusion", detected: 15, blocked: 13 },
-        { name: "DDoS", detected: 3, blocked: 3 },
-        { name: "Data Exfil", detected: 5, blocked: 4 },
-      ],
-      summary: "Detected 43 threats with 39 successfully blocked (90.7% success rate)."
-    }
-  };
 
   const handleDemo = async () => {
     if (!selectedFunction || !inputText.trim()) return;
 
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setResults(mockData[selectedFunction]);
+    try {
+      let endpoint = "";
+      let payload = {};
+
+      switch (selectedFunction) {
+        case "sentence_likelihood":
+          endpoint = "http://127.0.0.1:5000/analyze/sentence-likelihood";
+          payload = { text: inputText };
+          break;
+        
+        case "top_k_tokens":
+          endpoint = "http://127.0.0.1:5000/analyze/top-k-tokens";
+          payload = { 
+            text: inputText, 
+            k: parseInt(kValue), 
+            include_plot: includePlot 
+          };
+          break;
+        
+        case "embeddings":
+          endpoint = "http://127.0.0.1:5000/analyze/embeddings";
+          payload = { 
+            words: words.split(",").map(w => w.trim()).filter(w => w),
+            model: model 
+          };
+          break;
+        
+        case "attention":
+          endpoint = "http://127.0.0.1:5000/analyze/attention";
+          payload = { 
+            sentence: inputText,
+            model: model,
+            generative: true
+          };
+          break;
+        
+        case "attention_visualize":
+          endpoint = "http://127.0.0.1:5000/analyze/attention/visualize";
+          payload = { 
+            sentence: inputText,
+            model: model,
+            generative: true,
+            show_graph: showGraph
+          };
+          break;
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      setResults({ type: selectedFunction, data });
+    } catch (error) {
+      setResults({ type: "error", data: { error: error.message } });
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const renderResults = () => {
@@ -113,48 +105,358 @@ Score: 7/10 - Good security posture with room for improvement`,
     return (
       <Card className="mt-8">
         <CardHeader>
-          <CardTitle>Results</CardTitle>
+          <CardTitle>API Response</CardTitle>
           <Badge variant="outline">{selectedFunction.replace('_', ' ').toUpperCase()}</Badge>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <p className="text-sm text-gray-600">{results.summary}</p>
-            
-            {results.type === "chart" && (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={results.data}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#3b82f6" />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-
-            {results.type === "line_chart" && (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={results.data}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="cpu" stroke="#ef4444" name="CPU %" />
-                  <Line type="monotone" dataKey="memory" stroke="#10b981" name="Memory %" />
-                  <Line type="monotone" dataKey="network" stroke="#3b82f6" name="Network %" />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-
-            {results.type === "text" && (
-              <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm whitespace-pre-line">
-                {results.data}
+            {results.type === "error" && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h4 className="text-red-800 font-semibold mb-2">Error</h4>
+                <p className="text-red-700">{results.data.error}</p>
               </div>
             )}
+
+            {results.type === "sentence_likelihood" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">Model</Label>
+                    <p className="text-lg">{results.data.model}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Number of Tokens</Label>
+                    <p className="text-lg">{results.data.num_tokens}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Perplexity</Label>
+                    <p className="text-lg">{results.data.perplexity?.toFixed(4)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Total Likelihood</Label>
+                    <p className="text-lg">{results.data.total_likelihood?.toFixed(4)}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Token Likelihoods</Label>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="space-y-2">
+                      {results.data.tokens?.map(([token, likelihood], index) => (
+                        <div key={index} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-b-0">
+                          <span className="font-mono text-sm bg-white px-2 py-1 rounded">{token}</span>
+                          <span className="text-sm text-gray-600">{likelihood.toFixed(4)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {results.type === "top_k_tokens" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">Input Text</Label>
+                    <p className="text-sm bg-gray-50 p-2 rounded">{results.data.input_text}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">K Value</Label>
+                    <p className="text-lg">{results.data.k}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Top {results.data.k} Tokens</Label>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="space-y-2">
+                      {Object.entries(results.data.top_tokens || {}).map(([token, score], index) => (
+                        <div key={index} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-b-0">
+                          <span className="font-mono text-sm bg-white px-2 py-1 rounded">"{token}"</span>
+                          <span className="text-sm text-gray-600">{score.toFixed(4)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {results.type === "embeddings" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">Model</Label>
+                    <p className="text-lg">{results.data.model}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Words Processed</Label>
+                    <p className="text-lg">{results.data.words?.join(", ")}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Embeddings</Label>
+                  <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                    {Object.entries(results.data.embeddings || {}).map(([word, embedding]) => (
+                      <div key={word} className="mb-4">
+                        <h4 className="font-medium mb-2">"{word}"</h4>
+                        <div className="text-xs font-mono bg-white p-2 rounded border max-h-32 overflow-y-auto">
+                          {JSON.stringify(embedding[0]?.slice(0, 20), null, 2)}...
+                          <span className="text-gray-500"> (showing first 20 dimensions)</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {results.type === "attention" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">Sentence</Label>
+                    <p className="text-sm bg-gray-50 p-2 rounded">{results.data.sentence}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Model</Label>
+                    <p className="text-lg">{results.data.model}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Attention Scores (Sorted)</Label>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="space-y-2">
+                      {results.data.sorted_scores?.map(([token, score], index) => (
+                        <div key={index} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-b-0">
+                          <span className="font-mono text-sm bg-white px-2 py-1 rounded">"{token}"</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-32 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-green-600 h-2 rounded-full" 
+                                style={{ width: `${(score * 100)}%` }}
+                              />
+                            </div>
+                            <span className="text-sm text-gray-600 w-16 text-right">{score.toFixed(4)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {results.type === "attention_visualize" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">Sentence</Label>
+                    <p className="text-sm bg-gray-50 p-2 rounded">{results.data.sentence}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Graph Generated</Label>
+                    <p className="text-lg">{results.data.graph_generated ? "Yes" : "No"}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Attention Output</Label>
+                  <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm whitespace-pre-line">
+                    {results.data.attention_output}
+                  </div>
+                </div>
+
+                {results.data.graph_url && (
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Attention Visualization</Label>
+                    <img 
+                      src={results.data.graph_url} 
+                      alt="Attention Visualization Graph" 
+                      className="max-w-full h-auto border rounded-lg"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-6">
+              <Label className="text-sm font-medium mb-2 block">Raw API Response</Label>
+              <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-xs max-h-64 overflow-y-auto">
+                {JSON.stringify(results.data, null, 2)}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
     );
+  };
+
+  const renderInputFields = () => {
+    switch (selectedFunction) {
+      case "sentence_likelihood":
+        return (
+          <div>
+            <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700 mb-2">
+              Text to Analyze
+            </Label>
+            <Textarea
+              id="input-text"
+              placeholder="Enter text for likelihood analysis (e.g., 'The quick brown fox jumps over the lazy dog')"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              rows={3}
+            />
+          </div>
+        );
+      
+      case "top_k_tokens":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700 mb-2">
+                Input Text
+              </Label>
+              <Textarea
+                id="input-text"
+                placeholder="Enter incomplete text (e.g., 'The meaning of life is')"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="k-value" className="block text-sm font-medium text-gray-700 mb-2">
+                  K Value
+                </Label>
+                <Input
+                  id="k-value"
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={kValue}
+                  onChange={(e) => setKValue(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center space-x-2 pt-8">
+                <Checkbox 
+                  id="include-plot" 
+                  checked={includePlot}
+                  onCheckedChange={setIncludePlot}
+                />
+                <Label htmlFor="include-plot">Include Plot</Label>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case "embeddings":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="words" className="block text-sm font-medium text-gray-700 mb-2">
+                Words (comma-separated)
+              </Label>
+              <Input
+                id="words"
+                placeholder="hello, world, example"
+                value={words}
+                onChange={(e) => setWords(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="model" className="block text-sm font-medium text-gray-700 mb-2">
+                Model
+              </Label>
+              <Select value={model} onValueChange={setModel}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bert-base-uncased">BERT Base Uncased</SelectItem>
+                  <SelectItem value="gpt2">GPT-2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        );
+      
+      case "attention":
+      case "attention_visualize":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700 mb-2">
+                Sentence
+              </Label>
+              <Textarea
+                id="input-text"
+                placeholder="Enter sentence for attention analysis (e.g., 'The cat sat on the mat')"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="model" className="block text-sm font-medium text-gray-700 mb-2">
+                  Model
+                </Label>
+                <Select value={model} onValueChange={setModel}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt2">GPT-2</SelectItem>
+                    <SelectItem value="bert-base-uncased">BERT Base Uncased</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {selectedFunction === "attention_visualize" && (
+                <div className="flex items-center space-x-2 pt-8">
+                  <Checkbox 
+                    id="show-graph" 
+                    checked={showGraph}
+                    onCheckedChange={setShowGraph}
+                  />
+                  <Label htmlFor="show-graph">Generate Graph</Label>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      
+      default:
+        return (
+          <div>
+            <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700 mb-2">
+              Input Parameters
+            </Label>
+            <Textarea
+              id="input-text"
+              placeholder="Enter your input..."
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              rows={4}
+            />
+          </div>
+        );
+    }
+  };
+
+  const canRunDemo = () => {
+    if (!selectedFunction) return false;
+    
+    switch (selectedFunction) {
+      case "embeddings":
+        return words.trim().length > 0;
+      default:
+        return inputText.trim().length > 0;
+    }
   };
 
   return (
@@ -164,24 +466,24 @@ Score: 7/10 - Good security posture with room for improvement`,
       <main className="flex-1 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Interactive Demo</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Live API Demo</h1>
             <p className="text-xl text-gray-600">
-              Try out Black Box Scan functionality with our live demo
+              Test Black Box Scan API endpoints with real-time analysis
             </p>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Demo Configuration</CardTitle>
+              <CardTitle>API Configuration</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <label htmlFor="function-select" className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Functionality
-                </label>
+                <Label htmlFor="function-select" className="block text-sm font-medium text-gray-700 mb-2">
+                  Select API Endpoint
+                </Label>
                 <Select value={selectedFunction} onValueChange={setSelectedFunction}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a demo function..." />
+                    <SelectValue placeholder="Choose an API endpoint..." />
                   </SelectTrigger>
                   <SelectContent>
                     {demoFunctions.map((func) => (
@@ -193,28 +495,14 @@ Score: 7/10 - Good security posture with room for improvement`,
                 </Select>
               </div>
 
-              <div>
-                <label htmlFor="input-text" className="block text-sm font-medium text-gray-700 mb-2">
-                  Input Parameters
-                </label>
-                <Textarea
-                  id="input-text"
-                  placeholder="Enter target URL, IP address, or configuration parameters..."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  rows={4}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Example: https://example.com, 192.168.1.0/24, or custom configuration parameters
-                </p>
-              </div>
+              {selectedFunction && renderInputFields()}
 
               <Button 
                 onClick={handleDemo} 
-                disabled={!selectedFunction || !inputText.trim() || isLoading}
+                disabled={!canRunDemo() || isLoading}
                 className="w-full"
               >
-                {isLoading ? "Running Analysis..." : "Run Demo"}
+                {isLoading ? "Processing..." : "Run API Call"}
               </Button>
             </CardContent>
           </Card>
@@ -223,32 +511,32 @@ Score: 7/10 - Good security posture with room for improvement`,
 
           <Card className="mt-8">
             <CardHeader>
-              <CardTitle>Demo Features</CardTitle>
+              <CardTitle>Available API Endpoints</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold mb-2">Vulnerability Scanning</h4>
+                  <h4 className="font-semibold mb-2">Sentence Likelihood</h4>
                   <p className="text-sm text-gray-600">
-                    Comprehensive security vulnerability assessment with severity classification.
+                    Analyze the likelihood and perplexity of a given sentence using language models.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Performance Analysis</h4>
+                  <h4 className="font-semibold mb-2">Top-K Tokens</h4>
                   <p className="text-sm text-gray-600">
-                    Real-time system performance monitoring and resource utilization tracking.
+                    Predict the most likely next tokens for incomplete text input.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Security Audit</h4>
+                  <h4 className="font-semibold mb-2">Word Embeddings</h4>
                   <p className="text-sm text-gray-600">
-                    Complete security posture evaluation with detailed recommendations.
+                    Generate high-dimensional vector representations for words using BERT or GPT-2.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Network Mapping</h4>
+                  <h4 className="font-semibold mb-2">Attention Analysis</h4>
                   <p className="text-sm text-gray-600">
-                    Automated network topology discovery and service identification.
+                    Analyze attention weights to understand model focus on different parts of input.
                   </p>
                 </div>
               </div>
