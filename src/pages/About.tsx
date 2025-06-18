@@ -58,7 +58,7 @@ const About = () => {
           <div className="space-y-8">
             <Card>
               <CardHeader>
-                <CardTitle>Our Mission</CardTitle>
+                <CardTitle>Who are we?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-700 leading-relaxed">
