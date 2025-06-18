@@ -62,7 +62,7 @@ const Documentation = () => {
                   <div>
                     <h4 className="font-semibold mb-2">Required dependencies:</h4>
                     <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono">
-                      pip install torch transformers plotly matplotlib scikit-learn
+                      pip install -r requirements.txt
                     </div>
                   </div>
                   
