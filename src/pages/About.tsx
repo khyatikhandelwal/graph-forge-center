@@ -62,9 +62,10 @@ const About = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-700 leading-relaxed">
-                  BlackBoxScan is dedicated to democratizing advanced analysis tools through open-source development. 
-                  We believe that powerful scanning and analysis capabilities should be accessible to researchers, 
-                  developers, and organizations worldwide, fostering innovation and collaboration in the field.
+                  BlackBoxScan is the brainchild of Khyati Khandelwal - an Oxford grad, currently working at Google as an AI Engineer.
+                  She started this effort from her study table, working in the after-hours only to be able to propogate the AI research community.
+                  The resolve was clear - the world deserves a platform for latest research in AI analysis 
+                  as much as top researchers deserve a platform to showcase their contributions and help one another.
                 </p>
               </CardContent>
             </Card>
@@ -77,7 +78,7 @@ const About = () => {
                 <p className="text-gray-700 leading-relaxed">
                   We envision a future where complex system analysis is simplified through intelligent tools and 
                   community-driven development. Our goal is to create a comprehensive ecosystem where researchers 
-                  can share methodologies, data, and insights to advance the field of black box analysis.
+                  can share methodologies, data, and tools to advance the field of black box analysis.
                 </p>
               </CardContent>
             </Card>
@@ -93,7 +94,7 @@ const About = () => {
                 <ul className="list-disc list-inside text-gray-700 space-y-2">
                   <li>Research papers and academic contributions</li>
                   <li>Open datasets for training and validation</li>
-                  <li>Code contributions and methodology improvements</li>
+                  <li>Code contributions through PRs and methodology improvements</li>
                   <li>Documentation and tutorial enhancements</li>
                   <li>Bug reports and feature requests</li>
                 </ul>
