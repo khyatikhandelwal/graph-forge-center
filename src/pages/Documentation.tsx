@@ -1,4 +1,3 @@
-
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,19 +7,7 @@ import { Badge } from "@/components/ui/badge";
 const Documentation = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation placeholder */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="text-xl font-bold">BlackBoxScan</div>
-            <div className="flex space-x-8">
-              <a href="#" className="text-gray-700 hover:text-gray-900">Home</a>
-              <a href="#" className="text-gray-700 hover:text-gray-900">Documentation</a>
-              <a href="#" className="text-gray-700 hover:text-gray-900">About</a>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
       
       <main className="flex-1 py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -478,14 +465,7 @@ const Documentation = () => {
         </div>
       </main>
 
-      {/* Footer placeholder */}
-      <footer className="bg-gray-50 border-t">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-600">
-            <p>&copy; 2024 BlackBoxScan. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
