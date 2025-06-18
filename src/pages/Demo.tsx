@@ -98,6 +98,30 @@ const Demo = () => {
     }
   };
 
+  const renderImageFromUrl = (url, altText = "API Generated Image") => {
+    if (!url) return null;
+    
+    return (
+      <div className="mt-4">
+        <Label className="text-sm font-medium mb-2 block">{altText}</Label>
+        <div className="border rounded-lg overflow-hidden">
+          <img 
+            src={url} 
+            alt={altText}
+            className="max-w-full h-auto"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'block';
+            }}
+          />
+          <div className="bg-red-50 border border-red-200 rounded p-4 text-red-700 hidden">
+            Failed to load image from URL: {url}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderResults = () => {
     if (!results) return null;
 
@@ -150,6 +174,9 @@ const Demo = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Check for any image URLs in the response */}
+                {results.data.plot_url && renderImageFromUrl(results.data.plot_url, "Likelihood Plot")}
               </div>
             )}
 
@@ -179,6 +206,9 @@ const Demo = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Check for plot image URL */}
+                {results.data.plot_url && renderImageFromUrl(results.data.plot_url, "Top-K Tokens Plot")}
               </div>
             )}
 
@@ -209,6 +239,9 @@ const Demo = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* Check for visualization image URL */}
+                {results.data.visualization_url && renderImageFromUrl(results.data.visualization_url, "Embeddings Visualization")}
               </div>
             )}
 
@@ -246,6 +279,9 @@ const Demo = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Check for attention heatmap image URL */}
+                {results.data.heatmap_url && renderImageFromUrl(results.data.heatmap_url, "Attention Heatmap")}
               </div>
             )}
 
@@ -269,16 +305,10 @@ const Demo = () => {
                   </div>
                 </div>
 
-                {results.data.graph_url && (
-                  <div>
-                    <Label className="text-sm font-medium mb-2 block">Attention Visualization</Label>
-                    <img 
-                      src={results.data.graph_url} 
-                      alt="Attention Visualization Graph" 
-                      className="max-w-full h-auto border rounded-lg"
-                    />
-                  </div>
-                )}
+                {/* Check for multiple potential image URLs */}
+                {results.data.graph_url && renderImageFromUrl(results.data.graph_url, "Attention Visualization Graph")}
+                {results.data.heatmap_url && renderImageFromUrl(results.data.heatmap_url, "Attention Heatmap")}
+                {results.data.plot_url && renderImageFromUrl(results.data.plot_url, "Attention Plot")}
               </div>
             )}
 
