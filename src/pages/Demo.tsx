@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
@@ -130,11 +129,11 @@ const Demo = () => {
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Perplexity</Label>
-                    <p className="text-lg">{results.data.perplexity?.toFixed(4)}</p>
+                    <p className="text-lg">{typeof results.data.perplexity === 'number' ? results.data.perplexity.toFixed(4) : 'N/A'}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Total Likelihood</Label>
-                    <p className="text-lg">{results.data.total_likelihood?.toFixed(4)}</p>
+                    <p className="text-lg">{typeof results.data.total_likelihood === 'number' ? results.data.total_likelihood.toFixed(4) : 'N/A'}</p>
                   </div>
                 </div>
                 
@@ -145,7 +144,7 @@ const Demo = () => {
                       {results.data.tokens?.map(([token, likelihood], index) => (
                         <div key={index} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-b-0">
                           <span className="font-mono text-sm bg-white px-2 py-1 rounded">{token}</span>
-                          <span className="text-sm text-gray-600">{likelihood.toFixed(4)}</span>
+                          <span className="text-sm text-gray-600">{typeof likelihood === 'number' ? likelihood.toFixed(4) : 'N/A'}</span>
                         </div>
                       ))}
                     </div>
@@ -174,7 +173,7 @@ const Demo = () => {
                       {Object.entries(results.data.top_tokens || {}).map(([token, score], index) => (
                         <div key={index} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-b-0">
                           <span className="font-mono text-sm bg-white px-2 py-1 rounded">"{token}"</span>
-                          <span className="text-sm text-gray-600">{score.toFixed(4)}</span>
+                          <span className="text-sm text-gray-600">{typeof score === 'number' ? score.toFixed(4) : 'N/A'}</span>
                         </div>
                       ))}
                     </div>
@@ -346,7 +345,7 @@ const Demo = () => {
                 <Checkbox 
                   id="include-plot" 
                   checked={includePlot}
-                  onCheckedChange={setIncludePlot}
+                  onCheckedChange={(checked) => setIncludePlot(checked === true)}
                 />
                 <Label htmlFor="include-plot">Include Plot</Label>
               </div>
@@ -421,7 +420,7 @@ const Demo = () => {
                   <Checkbox 
                     id="show-graph" 
                     checked={showGraph}
-                    onCheckedChange={setShowGraph}
+                    onCheckedChange={(checked) => setShowGraph(checked === true)}
                   />
                   <Label htmlFor="show-graph">Generate Graph</Label>
                 </div>
