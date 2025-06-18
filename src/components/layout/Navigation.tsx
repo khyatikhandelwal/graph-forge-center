@@ -48,7 +48,7 @@ const Navigation = () => {
             ))}
             <Button variant="outline" size="sm" asChild>
               <a
-                href="https://github.com"
+                href="https://github.com/khyatikhandelwal/blackboxscan"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2"
