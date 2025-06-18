@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
@@ -98,7 +99,7 @@ const Demo = () => {
     }
   };
 
-  const renderImageFromUrl = (url, altText = "API Generated Image") => {
+  const renderImageFromUrl = (url: string, altText: string = "API Generated Image") => {
     if (!url) return null;
     
     return (
@@ -110,8 +111,12 @@ const Demo = () => {
             alt={altText}
             className="max-w-full h-auto"
             onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'block';
+              const target = e.target as HTMLImageElement;
+              const errorDiv = target.nextSibling as HTMLElement;
+              target.style.display = 'none';
+              if (errorDiv) {
+                errorDiv.style.display = 'block';
+              }
             }}
           />
           <div className="bg-red-50 border border-red-200 rounded p-4 text-red-700 hidden">
@@ -407,7 +412,7 @@ const Demo = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="bert-base-uncased">BERT Base Uncased</SelectItem>
-                  <SelectItem value="gpt2">GPT-2</SelectItem>
+                  <SelectItem value="distilbert-base-uncased">DistilBERT Base Uncased</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -547,19 +552,19 @@ const Demo = () => {
                 <div>
                   <h4 className="font-semibold mb-2">Sentence Likelihood</h4>
                   <p className="text-sm text-gray-600">
-                    Analyze the likelihood and perplexity of a given sentence using language models.
+                    Analyze the likelihood and perplexity of a given sentence using GPT-2.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Top-K Tokens</h4>
                   <p className="text-sm text-gray-600">
-                    Predict the most likely next tokens for incomplete text input.
+                    Predict the most likely next tokens for incomplete text input using GPT-2.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Word Embeddings</h4>
                   <p className="text-sm text-gray-600">
-                    Generate high-dimensional vector representations for words using BERT or GPT-2.
+                    Generate high-dimensional vector representations for words using BERT or DistilBERT.
                   </p>
                 </div>
                 <div>
