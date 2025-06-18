@@ -19,7 +19,7 @@ const Index = () => {
               BlackBoxScan
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              It's Time to Look Inside! Advanced open-source library for black box scanning and analysis.
+              From Curiosity to Contribution—Advancing AI Research.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -40,7 +40,7 @@ const Index = () => {
                 Why Choose BlackBoxScan?
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Powerful tools and community-driven development for advanced analysis
+                Powerful tools and community-driven development for SOTA research techniques
               </p>
             </div>
 
@@ -50,7 +50,7 @@ const Index = () => {
                   <Book className="mx-auto h-12 w-12 text-green-600 mb-4" />
                   <CardTitle>Comprehensive Documentation</CardTitle>
                   <CardDescription>
-                    Detailed guides, API references, and examples to get you started quickly
+                    Detailed guides, API references, and demos to get you started quickly
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -70,7 +70,7 @@ const Index = () => {
                   <Users className="mx-auto h-12 w-12 text-green-600 mb-4" />
                   <CardTitle>Community Driven</CardTitle>
                   <CardDescription>
-                    Join researchers and developers contributing papers, data, and methodologies
+                    Join world-class researchers and developers contributing papers, data, and methodologies
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -85,14 +85,14 @@ const Index = () => {
               Ready to Get Started?
             </h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Join our community and start contributing to the future of black box analysis
+              Join our community and start contributing to the future of AI research
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
                 <Link to="/contribute">Contribute Now</Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/khyatikhandelwal/blackboxscan" target="_blank" rel="noopener noreferrer">
                   View on GitHub
                 </a>
               </Button>
