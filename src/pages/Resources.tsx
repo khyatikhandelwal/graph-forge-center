@@ -1,74 +1,60 @@
 
+import { useEffect, useState } from "react";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Github, FileText, Database, Users, Star, GitFork, Calendar, ExternalLink } from "lucide-react";
+import { Github, FileText, Database, Users, Calendar, ExternalLink } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface Contribution {
+  id: string;
+  title: string;
+  description: string;
+  type: "research" | "dataset" | "methodology" | "community";
+  github_url?: string;
+  paper_url?: string;
+  dataset_url?: string;
+  author_name: string;
+  author_email: string;
+  created_at: string;
+}
 
 const Resources = () => {
-  // Mock data for contributed resources
-  const resources = [
-    {
-      id: 1,
-      title: "Advanced Neural Network Scanner",
-      description: "Deep learning approach for improved vulnerability detection using transformer architectures and ensemble methods.",
-      type: "methodology",
-      author: "Dr. Sarah Chen",
-      organization: "MIT Security Lab",
-      githubUrl: "https://github.com/sarahchen/neural-scanner",
-      paperUrl: "https://arxiv.org/abs/2023.12345",
-      stars: 156,
-      forks: 23,
-      lastUpdated: "2024-01-15",
-      language: "Python",
-      tags: ["deep-learning", "security", "neural-networks"]
-    },
-    {
-      id: 2,
-      title: "Large-scale Web Security Dataset",
-      description: "Comprehensive dataset containing 10M+ labeled security scan results for training machine learning models.",
-      type: "dataset",
-      author: "Security Research Lab",
-      organization: "Stanford University",
-      datasetUrl: "https://datasets.stanford.edu/websec-10m",
-      paperUrl: "https://arxiv.org/abs/2023.54321",
-      size: "2.3 GB",
-      samples: "10,247,892",
-      lastUpdated: "2024-01-10",
-      tags: ["dataset", "web-security", "machine-learning"]
-    },
-    {
-      id: 3,
-      title: "Real-time Threat Classification",
-      description: "Novel approach to real-time threat classification using ensemble methods and feature engineering.",
-      type: "research",
-      author: "Alex Rodriguez",
-      organization: "CyberSec Institute",
-      paperUrl: "https://arxiv.org/abs/2023.98765",
-      githubUrl: "https://github.com/alexr/threat-classifier",
-      stars: 89,
-      forks: 12,
-      lastUpdated: "2024-01-08",
-      language: "JavaScript",
-      tags: ["real-time", "classification", "security"]
-    },
-    {
-      id: 4,
-      title: "BlackBox Analysis Toolkit",
-      description: "Community-driven toolkit for black box security analysis with modular architecture.",
-      type: "community",
-      author: "OpenSec Community",
-      organization: "Open Source",
-      githubUrl: "https://github.com/opensec/blackbox-toolkit",
-      stars: 234,
-      forks: 45,
-      lastUpdated: "2024-01-12",
-      language: "TypeScript",
-      tags: ["toolkit", "modular", "community"]
+  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchContributions();
+  }, []);
+
+  const fetchContributions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('contributions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      setContributions(data || []);
+    } catch (error) {
+      console.error('Error fetching contributions:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load contributions. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -101,12 +87,27 @@ const Resources = () => {
   };
 
   const filterByType = (type: string) => {
-    if (type === "all") return resources;
-    return resources.filter(resource => resource.type === type);
+    if (type === "all") return contributions;
+    return contributions.filter(contribution => contribution.type === type);
   };
 
-  const ResourceCard = ({ resource }: { resource: any }) => {
-    const Icon = getTypeIcon(resource.type);
+  const getTypeCounts = () => {
+    const counts = {
+      dataset: 0,
+      research: 0,
+      methodology: 0,
+      community: 0
+    };
+    
+    contributions.forEach(contribution => {
+      counts[contribution.type]++;
+    });
+    
+    return counts;
+  };
+
+  const ResourceCard = ({ contribution }: { contribution: Contribution }) => {
+    const Icon = getTypeIcon(contribution.type);
     
     return (
       <Card className="hover:shadow-lg transition-shadow">
@@ -114,80 +115,46 @@ const Resources = () => {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2 mb-2">
               <Icon className="h-5 w-5 text-gray-600" />
-              <Badge className={getTypeColor(resource.type)}>
-                {getTypeLabel(resource.type)}
+              <Badge className={getTypeColor(contribution.type)}>
+                {getTypeLabel(contribution.type)}
               </Badge>
             </div>
-            {resource.stars && (
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4" />
-                  {resource.stars}
-                </div>
-                <div className="flex items-center gap-1">
-                  <GitFork className="h-4 w-4" />
-                  {resource.forks}
-                </div>
-              </div>
-            )}
           </div>
-          <CardTitle className="text-lg">{resource.title}</CardTitle>
-          <p className="text-sm text-gray-600">{resource.description}</p>
+          <CardTitle className="text-lg">{contribution.title}</CardTitle>
+          <p className="text-sm text-gray-600">{contribution.description}</p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm">
               <div>
-                <p className="font-medium">{resource.author}</p>
-                <p className="text-gray-500">{resource.organization}</p>
+                <p className="font-medium">{contribution.author_name}</p>
               </div>
               <div className="flex items-center gap-1 text-gray-500">
                 <Calendar className="h-4 w-4" />
-                {new Date(resource.lastUpdated).toLocaleDateString()}
+                {new Date(contribution.created_at).toLocaleDateString()}
               </div>
-            </div>
-            
-            {resource.language && (
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">{resource.language}</span>
-              </div>
-            )}
-            
-            {resource.size && (
-              <div className="text-sm text-gray-600">
-                <strong>Size:</strong> {resource.size} | <strong>Samples:</strong> {resource.samples?.toLocaleString()}
-              </div>
-            )}
-            
-            <div className="flex flex-wrap gap-1">
-              {resource.tags.map((tag: string, index: number) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
             </div>
             
             <div className="flex gap-2 pt-2">
-              {resource.githubUrl && (
+              {contribution.github_url && (
                 <Button variant="outline" size="sm" asChild>
-                  <a href={resource.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={contribution.github_url} target="_blank" rel="noopener noreferrer">
                     <Github className="h-4 w-4 mr-1" />
                     Code
                   </a>
                 </Button>
               )}
-              {resource.paperUrl && (
+              {contribution.paper_url && (
                 <Button variant="outline" size="sm" asChild>
-                  <a href={resource.paperUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={contribution.paper_url} target="_blank" rel="noopener noreferrer">
                     <FileText className="h-4 w-4 mr-1" />
                     Paper
                   </a>
                 </Button>
               )}
-              {resource.datasetUrl && (
+              {contribution.dataset_url && (
                 <Button variant="outline" size="sm" asChild>
-                  <a href={resource.datasetUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={contribution.dataset_url} target="_blank" rel="noopener noreferrer">
                     <Database className="h-4 w-4 mr-1" />
                     Dataset
                   </a>
@@ -199,6 +166,23 @@ const Resources = () => {
       </Card>
     );
   };
+
+  const typeCounts = getTypeCounts();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navigation />
+        <main className="flex-1 py-12 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading contributions...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -218,29 +202,29 @@ const Resources = () => {
               <Card>
                 <CardContent className="p-6 text-center">
                   <Database className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold">1</p>
+                  <p className="text-2xl font-bold">{typeCounts.dataset}</p>
                   <p className="text-sm text-gray-600">Datasets</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
                   <FileText className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold">1</p>
+                  <p className="text-2xl font-bold">{typeCounts.research}</p>
                   <p className="text-sm text-gray-600">Research Papers</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
                   <Github className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold">2</p>
-                  <p className="text-sm text-gray-600">Code Repositories</p>
+                  <p className="text-2xl font-bold">{typeCounts.methodology}</p>
+                  <p className="text-sm text-gray-600">Methodologies</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
                   <Users className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold">4</p>
-                  <p className="text-sm text-gray-600">Total Contributors</p>
+                  <p className="text-2xl font-bold">{typeCounts.community}</p>
+                  <p className="text-sm text-gray-600">Community Tools</p>
                 </CardContent>
               </Card>
             </div>
@@ -256,41 +240,53 @@ const Resources = () => {
             </TabsList>
             
             <TabsContent value="all" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {resources.map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} />
-                ))}
-              </div>
+              {contributions.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">No contributions yet. Be the first to contribute!</p>
+                  <Button asChild className="mt-4">
+                    <a href="/contribute">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Submit Your Contribution
+                    </a>
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {contributions.map((contribution) => (
+                    <ResourceCard key={contribution.id} contribution={contribution} />
+                  ))}
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="dataset" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filterByType("dataset").map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} />
+                {filterByType("dataset").map((contribution) => (
+                  <ResourceCard key={contribution.id} contribution={contribution} />
                 ))}
               </div>
             </TabsContent>
             
             <TabsContent value="research" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filterByType("research").map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} />
+                {filterByType("research").map((contribution) => (
+                  <ResourceCard key={contribution.id} contribution={contribution} />
                 ))}
               </div>
             </TabsContent>
             
             <TabsContent value="methodology" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filterByType("methodology").map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} />
+                {filterByType("methodology").map((contribution) => (
+                  <ResourceCard key={contribution.id} contribution={contribution} />
                 ))}
               </div>
             </TabsContent>
             
             <TabsContent value="community" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filterByType("community").map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} />
+                {filterByType("community").map((contribution) => (
+                  <ResourceCard key={contribution.id} contribution={contribution} />
                 ))}
               </div>
             </TabsContent>

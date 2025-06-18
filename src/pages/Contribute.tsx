@@ -9,19 +9,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Github, FileText, Database, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contribute = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     type: "",
-    githubUrl: "",
-    paperUrl: "",
-    datasetUrl: "",
-    authorName: "",
-    authorEmail: ""
+    github_url: "",
+    paper_url: "",
+    dataset_url: "",
+    author_name: "",
+    author_email: ""
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const contributionTypes = [
@@ -31,32 +33,61 @@ const Contribute = () => {
     { id: "community", label: "Community Tool", icon: Users, color: "bg-orange-100 text-orange-800" }
   ];
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would normally send the data to your API
-    console.log("Contribution submitted:", formData);
+    if (isSubmitting) return;
     
-    toast({
-      title: "Contribution Submitted!",
-      description: "Thank you for contributing to Black Box Scan. We'll review your submission soon.",
-    });
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('contributions')
+        .insert([{
+          title: formData.title,
+          description: formData.description,
+          type: formData.type,
+          github_url: formData.github_url || null,
+          paper_url: formData.paper_url || null,
+          dataset_url: formData.dataset_url || null,
+          author_name: formData.author_name,
+          author_email: formData.author_email
+        }]);
 
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      type: "",
-      githubUrl: "",
-      paperUrl: "",
-      datasetUrl: "",
-      authorName: "",
-      authorEmail: ""
-    });
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Contribution Submitted!",
+        description: "Thank you for contributing to Black Box Scan. Your submission has been saved.",
+      });
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        type: "",
+        github_url: "",
+        paper_url: "",
+        dataset_url: "",
+        author_name: "",
+        author_email: ""
+      });
+    } catch (error) {
+      console.error('Error submitting contribution:', error);
+      toast({
+        title: "Error",
+        description: "There was an error submitting your contribution. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -91,30 +122,6 @@ const Contribute = () => {
                       </div>
                     );
                   })}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Community Stats</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Contributors</span>
-                    <span className="font-semibold">1,247</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Research Papers</span>
-                    <span className="font-semibold">89</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Datasets</span>
-                    <span className="font-semibold">156</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Code Contributions</span>
-                    <span className="font-semibold">423</span>
-                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -177,8 +184,8 @@ const Contribute = () => {
                           Your Name *
                         </label>
                         <Input
-                          value={formData.authorName}
-                          onChange={(e) => handleInputChange("authorName", e.target.value)}
+                          value={formData.author_name}
+                          onChange={(e) => handleInputChange("author_name", e.target.value)}
                           placeholder="Your full name"
                           required
                         />
@@ -189,8 +196,8 @@ const Contribute = () => {
                         </label>
                         <Input
                           type="email"
-                          value={formData.authorEmail}
-                          onChange={(e) => handleInputChange("authorEmail", e.target.value)}
+                          value={formData.author_email}
+                          onChange={(e) => handleInputChange("author_email", e.target.value)}
                           placeholder="your.email@example.com"
                           required
                         />
@@ -206,8 +213,8 @@ const Contribute = () => {
                         </label>
                         <Input
                           type="url"
-                          value={formData.githubUrl}
-                          onChange={(e) => handleInputChange("githubUrl", e.target.value)}
+                          value={formData.github_url}
+                          onChange={(e) => handleInputChange("github_url", e.target.value)}
                           placeholder="https://github.com/username/repository"
                         />
                       </div>
@@ -218,8 +225,8 @@ const Contribute = () => {
                         </label>
                         <Input
                           type="url"
-                          value={formData.paperUrl}
-                          onChange={(e) => handleInputChange("paperUrl", e.target.value)}
+                          value={formData.paper_url}
+                          onChange={(e) => handleInputChange("paper_url", e.target.value)}
                           placeholder="https://arxiv.org/abs/..."
                         />
                       </div>
@@ -230,62 +237,19 @@ const Contribute = () => {
                         </label>
                         <Input
                           type="url"
-                          value={formData.datasetUrl}
-                          onChange={(e) => handleInputChange("datasetUrl", e.target.value)}
+                          value={formData.dataset_url}
+                          onChange={(e) => handleInputChange("dataset_url", e.target.value)}
                           placeholder="https://dataset-hosting-platform.com/..."
                         />
                       </div>
                     </div>
 
-                    <Button type="submit" className="w-full">
-                      Submit Contribution
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>
+                      {isSubmitting ? "Submitting..." : "Submit Contribution"}
                     </Button>
                   </form>
                 </CardContent>
               </Card>
-            </div>
-          </div>
-
-          {/* Recent Contributions */}
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Contributions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "Advanced Neural Network Scanner",
-                  author: "Dr. Sarah Chen",
-                  type: "methodology",
-                  description: "Deep learning approach for improved vulnerability detection"
-                },
-                {
-                  title: "Large-scale Web Security Dataset",
-                  author: "Security Research Lab",
-                  type: "dataset",
-                  description: "10M+ labeled security scan results for training"
-                },
-                {
-                  title: "Real-time Threat Classification",
-                  author: "Alex Rodriguez",
-                  type: "research",
-                  description: "Novel approach to real-time threat classification using ensemble methods"
-                }
-              ].map((contribution, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <Badge className={contributionTypes.find(t => t.id === contribution.type)?.color}>
-                        {contributionTypes.find(t => t.id === contribution.type)?.label}
-                      </Badge>
-                      <span className="text-xs text-gray-500">2 days ago</span>
-                    </div>
-                    <CardTitle className="text-lg">{contribution.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 mb-2">{contribution.description}</p>
-                    <p className="text-xs text-gray-500">by {contribution.author}</p>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
           </div>
         </div>
