@@ -6,7 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, FileText, Database } from "lucide-react";
+import { ExternalLink, Github, FileText, Database as DatabaseIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -39,7 +39,7 @@ const Resources = () => {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'research': return <FileText size={16} />;
-      case 'dataset': return <Database size={16} />;
+      case 'dataset': return <DatabaseIcon size={16} />;
       case 'methodology': return <FileText size={16} />;
       case 'community': return <Github size={16} />;
       default: return <FileText size={16} />;
@@ -136,7 +136,7 @@ const Resources = () => {
                       {contribution.dataset_url && (
                         <Button variant="outline" size="sm" asChild className="w-full">
                           <a href={contribution.dataset_url} target="_blank" rel="noopener noreferrer">
-                            <Database size={16} className="mr-2" />
+                            <DatabaseIcon size={16} className="mr-2" />
                             Dataset
                             <ExternalLink size={14} className="ml-auto" />
                           </a>
