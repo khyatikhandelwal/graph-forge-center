@@ -100,15 +100,21 @@ const Demo = () => {
     }
   };
 
-  const renderImageFromUrl = (url: string, altText: string = "API Generated Image") => {
-    if (!url) return null;
+  const renderImage = (imageData: string, altText: string = "API Generated Image") => {
+    if (!imageData) return null;
+    
+    // Check if it's a base64 image (starts with data:image) or a URL
+    const isBase64 = imageData.startsWith('data:image/') || !imageData.startsWith('http');
+    const imageSrc = isBase64 && !imageData.startsWith('data:image/') 
+      ? `data:image/png;base64,${imageData}` 
+      : imageData;
     
     return (
       <div className="mt-4">
         <Label className="text-sm font-medium mb-2 block">{altText}</Label>
         <div className="border rounded-lg overflow-hidden">
           <img 
-            src={url} 
+            src={imageSrc} 
             alt={altText}
             className="max-w-full h-auto"
             onError={(e) => {
@@ -121,7 +127,7 @@ const Demo = () => {
             }}
           />
           <div className="bg-red-50 border border-red-200 rounded p-4 text-red-700 hidden">
-            Failed to load image from URL: {url}
+            Failed to load image from: {isBase64 ? 'base64 data' : imageSrc}
           </div>
         </div>
       </div>
@@ -181,8 +187,9 @@ const Demo = () => {
                   </div>
                 </div>
 
-                {/* Check for any image URLs in the response */}
-                {results.data.plot_url && renderImageFromUrl(results.data.plot_url, "Likelihood Plot")}
+                {/* Handle base64 plot images */}
+                {results.data.plot && renderImage(results.data.plot, "Likelihood Plot")}
+                {results.data.plot_url && renderImage(results.data.plot_url, "Likelihood Plot")}
               </div>
             )}
 
@@ -213,8 +220,9 @@ const Demo = () => {
                   </div>
                 </div>
 
-                {/* Check for plot image URL */}
-                {results.data.plot_url && renderImageFromUrl(results.data.plot_url, "Top-K Tokens Plot")}
+                {/* Handle base64 plot images */}
+                {results.data.plot && renderImage(results.data.plot, "Top-K Tokens Plot")}
+                {results.data.plot_url && renderImage(results.data.plot_url, "Top-K Tokens Plot")}
               </div>
             )}
 
@@ -246,8 +254,9 @@ const Demo = () => {
                   </div>
                 </div>
 
-                {/* Check for visualization image URL */}
-                {results.data.visualization_url && renderImageFromUrl(results.data.visualization_url, "Embeddings Visualization")}
+                {/* Handle base64 visualization images */}
+                {results.data.visualization && renderImage(results.data.visualization, "Embeddings Visualization")}
+                {results.data.visualization_url && renderImage(results.data.visualization_url, "Embeddings Visualization")}
               </div>
             )}
 
@@ -286,8 +295,9 @@ const Demo = () => {
                   </div>
                 </div>
 
-                {/* Check for attention heatmap image URL */}
-                {results.data.heatmap_url && renderImageFromUrl(results.data.heatmap_url, "Attention Heatmap")}
+                {/* Handle base64 heatmap images */}
+                {results.data.heatmap && renderImage(results.data.heatmap, "Attention Heatmap")}
+                {results.data.heatmap_url && renderImage(results.data.heatmap_url, "Attention Heatmap")}
               </div>
             )}
 
@@ -311,10 +321,13 @@ const Demo = () => {
                   </div>
                 </div>
 
-                {/* Check for multiple potential image URLs */}
-                {results.data.graph_url && renderImageFromUrl(results.data.graph_url, "Attention Visualization Graph")}
-                {results.data.heatmap_url && renderImageFromUrl(results.data.heatmap_url, "Attention Heatmap")}
-                {results.data.plot_url && renderImageFromUrl(results.data.plot_url, "Attention Plot")}
+                {/* Handle base64 visualization images */}
+                {results.data.graph && renderImage(results.data.graph, "Attention Visualization Graph")}
+                {results.data.graph_url && renderImage(results.data.graph_url, "Attention Visualization Graph")}
+                {results.data.heatmap && renderImage(results.data.heatmap, "Attention Heatmap")}
+                {results.data.heatmap_url && renderImage(results.data.heatmap_url, "Attention Heatmap")}
+                {results.data.plot && renderImage(results.data.plot, "Attention Plot")}
+                {results.data.plot_url && renderImage(results.data.plot_url, "Attention Plot")}
               </div>
             )}
 
