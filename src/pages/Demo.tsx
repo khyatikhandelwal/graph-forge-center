@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
@@ -30,6 +29,8 @@ const Demo = () => {
     { value: "attention_visualize", label: "Attention Visualization" },
   ];
 
+  const API_BASE_URL = "https://khyatikhandelwal20-blackboxscan-demo.hf.space";
+
   const handleDemo = async () => {
     if (!selectedFunction || !inputText.trim()) return;
 
@@ -41,12 +42,12 @@ const Demo = () => {
 
       switch (selectedFunction) {
         case "sentence_likelihood":
-          endpoint = "http://127.0.0.1:5000/analyze/sentence-likelihood";
+          endpoint = `${API_BASE_URL}/analyze/sentence-likelihood`;
           payload = { text: inputText };
           break;
         
         case "top_k_tokens":
-          endpoint = "http://127.0.0.1:5000/analyze/top-k-tokens";
+          endpoint = `${API_BASE_URL}/analyze/top-k-tokens`;
           payload = { 
             text: inputText, 
             k: parseInt(kValue), 
@@ -55,7 +56,7 @@ const Demo = () => {
           break;
         
         case "embeddings":
-          endpoint = "http://127.0.0.1:5000/analyze/embeddings";
+          endpoint = `${API_BASE_URL}/analyze/embeddings`;
           payload = { 
             words: words.split(",").map(w => w.trim()).filter(w => w),
             model: model 
@@ -63,7 +64,7 @@ const Demo = () => {
           break;
         
         case "attention":
-          endpoint = "http://127.0.0.1:5000/analyze/attention";
+          endpoint = `${API_BASE_URL}/analyze/attention`;
           payload = { 
             sentence: inputText,
             model: model,
@@ -72,7 +73,7 @@ const Demo = () => {
           break;
         
         case "attention_visualize":
-          endpoint = "http://127.0.0.1:5000/analyze/attention/visualize";
+          endpoint = `${API_BASE_URL}/analyze/attention/visualize`;
           payload = { 
             sentence: inputText,
             model: model,
