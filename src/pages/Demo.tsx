@@ -207,20 +207,34 @@ const Demo = () => {
                 </div>
                 
                 <div>
-                  <Label className="text-sm font-medium mb-2 block">Top {results.data.k} Tokens</Label>
+                  <Label className="text-sm font-medium mb-2 block">Top {results.data.k} Token Predictions</Label>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="space-y-2">
-                      {Object.entries(results.data.top_tokens || {}).map(([token, score], index) => (
-                        <div key={index} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-b-0">
-                          <span className="font-mono text-sm bg-white px-2 py-1 rounded">"{token}"</span>
-                          <span className="text-sm text-gray-600">{typeof score === 'number' ? score.toFixed(4) : 'N/A'}</span>
+                    <div className="space-y-3">
+                      {results.data.top_tokens && Object.entries(results.data.top_tokens)
+                        .filter(([key]) => key !== 'plot_url')
+                        .sort(([,a], [,b]) => (b as number) - (a as number))
+                        .map(([token, score], index) => (
+                        <div key={index} className="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                          <div className="flex items-center space-x-3">
+                            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                              #{index + 1}
+                            </span>
+                            <span className="font-mono text-sm font-medium">"{token}"</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-sm font-medium text-gray-900">
+                              {typeof score === 'number' ? score.toFixed(2) : 'N/A'}
+                            </span>
+                            <div className="text-xs text-gray-500">score</div>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Handle base64 plot images */}
+                {/* Handle base64 plot images from top_tokens object */}
+                {results.data.top_tokens?.plot_url && renderImage(results.data.top_tokens.plot_url, "Top-K Tokens Visualization")}
                 {results.data.plot && renderImage(results.data.plot, "Top-K Tokens Plot")}
                 {results.data.plot_url && renderImage(results.data.plot_url, "Top-K Tokens Plot")}
               </div>
