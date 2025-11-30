@@ -312,7 +312,7 @@ const AIWatermarking = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="sift">SIFT</SelectItem>
+                        <SelectItem value="sift">SIFT (Recommended - Robust to edits)</SelectItem>
                         <SelectItem value="dwt">DWT</SelectItem>
                         <SelectItem value="dct">DCT</SelectItem>
                       </SelectContent>
@@ -360,7 +360,7 @@ const AIWatermarking = () => {
                     <div className="space-y-2">
                       <Label>Result</Label>
                       <div className="p-4 bg-muted rounded-md space-y-4">
-                        {freqResult.unwatermarked_image && freqResult.watermarked_image && (
+                        {freqResult.unwatermarked_image && freqResult.watermarked_image ? (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label className="text-sm">Original Image</Label>
@@ -371,10 +371,48 @@ const AIWatermarking = () => {
                               <img src={`data:image/png;base64,${freqResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded border" />
                             </div>
                           </div>
+                        ) : freqResult.is_watermarked !== undefined ? (
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-3 p-4 bg-background rounded-lg border">
+                              <span className="text-3xl">{freqResult.is_watermarked ? "✅" : "❌"}</span>
+                              <div>
+                                <p className="font-semibold text-lg">
+                                  {freqResult.is_watermarked ? "Watermark Detected" : "No Watermark Detected"}
+                                </p>
+                                <p className="text-sm text-muted-foreground">Method: {freqResult.method?.toUpperCase()}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div className="p-3 bg-background rounded-lg border">
+                                <p className="text-sm text-muted-foreground mb-1">🎯 Bit Accuracy</p>
+                                <p className="text-xl font-semibold">{(freqResult.bit_accuracy * 100).toFixed(1)}%</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {freqResult.matching_bits}/{freqResult.total_bits} bits matched
+                                </p>
+                              </div>
+                              
+                              <div className="p-3 bg-background rounded-lg border">
+                                <p className="text-sm text-muted-foreground mb-1">📊 Confidence</p>
+                                <p className="text-xl font-semibold">{(freqResult.confidence * 100).toFixed(2)}%</p>
+                              </div>
+                              
+                              <div className="p-3 bg-background rounded-lg border">
+                                <p className="text-sm text-muted-foreground mb-1">🔗 Correlation</p>
+                                <p className="text-xl font-semibold">{freqResult.correlation?.toFixed(4)}</p>
+                              </div>
+                              
+                              <div className="p-3 bg-background rounded-lg border">
+                                <p className="text-sm text-muted-foreground mb-1">📈 P-Value</p>
+                                <p className="text-xl font-semibold">{freqResult.correlation_p_value?.toFixed(4)}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <pre className="text-sm text-foreground whitespace-pre-wrap">
+                            {JSON.stringify(freqResult, null, 2)}
+                          </pre>
                         )}
-                        <pre className="text-sm text-foreground whitespace-pre-wrap">
-                          {JSON.stringify(freqResult, null, 2)}
-                        </pre>
                       </div>
                     </div>
                   )}
