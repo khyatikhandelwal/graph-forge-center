@@ -359,9 +359,18 @@ const AIWatermarking = () => {
                   {freqResult && (
                     <div className="space-y-2">
                       <Label>Result</Label>
-                      <div className="p-4 bg-muted rounded-md space-y-2">
-                        {freqResult.watermarked_image && (
-                          <img src={`data:image/png;base64,${freqResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded" />
+                      <div className="p-4 bg-muted rounded-md space-y-4">
+                        {freqResult.unwatermarked_image && freqResult.watermarked_image && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-sm">Original Image</Label>
+                              <img src={`data:image/png;base64,${freqResult.unwatermarked_image}`} alt="Original" className="max-w-full h-auto rounded border" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-sm">Watermarked Image</Label>
+                              <img src={`data:image/png;base64,${freqResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded border" />
+                            </div>
+                          </div>
                         )}
                         <pre className="text-sm text-foreground whitespace-pre-wrap">
                           {JSON.stringify(freqResult, null, 2)}
@@ -440,9 +449,18 @@ const AIWatermarking = () => {
                   {robustResult && (
                     <div className="space-y-2">
                       <Label>Result</Label>
-                      <div className="p-4 bg-primary/10 border border-primary rounded-md space-y-2">
-                        {robustResult.watermarked_image && (
-                          <img src={`data:image/png;base64,${robustResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded" />
+                      <div className="p-4 bg-primary/10 border border-primary rounded-md space-y-4">
+                        {robustResult.unwatermarked_image && robustResult.watermarked_image && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-sm">Original Image</Label>
+                              <img src={`data:image/png;base64,${robustResult.unwatermarked_image}`} alt="Original" className="max-w-full h-auto rounded border" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-sm">Watermarked Image</Label>
+                              <img src={`data:image/png;base64,${robustResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded border" />
+                            </div>
+                          </div>
                         )}
                         <pre className="text-sm text-foreground font-medium whitespace-pre-wrap">
                           {JSON.stringify(robustResult, null, 2)}
