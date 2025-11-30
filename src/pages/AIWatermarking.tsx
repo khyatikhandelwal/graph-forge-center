@@ -7,89 +7,181 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, Upload, FileText, Image as ImageIcon, Zap } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, FileText, Image as ImageIcon, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const AIWatermarking = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   // Text Model State
-  const [textInput, setTextInput] = useState("");
-  const [textOutput, setTextOutput] = useState("");
+  const [textMode, setTextMode] = useState<"generate" | "detect">("generate");
+  const [textPrompt, setTextPrompt] = useState("");
+  const [textToDetect, setTextToDetect] = useState("");
+  const [textResult, setTextResult] = useState<any>(null);
 
-  // Image Models State
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const [imageOutput, setImageOutput] = useState("");
+  // Frequency Domain Image State
+  const [freqMode, setFreqMode] = useState<"generate" | "detect">("generate");
+  const [freqPrompt, setFreqPrompt] = useState("");
+  const [freqMethod, setFreqMethod] = useState("sift");
+  const [freqFile, setFreqFile] = useState<File | null>(null);
+  const [freqPreview, setFreqPreview] = useState<string>("");
+  const [freqResult, setFreqResult] = useState<any>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // Robust Image State
+  const [robustMode, setRobustMode] = useState<"generate" | "detect">("generate");
+  const [robustPrompt, setRobustPrompt] = useState("");
+  const [robustFile, setRobustFile] = useState<File | null>(null);
+  const [robustPreview, setRobustPreview] = useState<string>("");
+  const [robustResult, setRobustResult] = useState<any>(null);
 
-  const handleTextModelSubmit = async () => {
-    if (!textInput.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter some text to watermark",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleTextSubmit = async () => {
     setIsLoading(true);
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      setTextOutput("Watermarked text will appear here once API is connected");
-      toast({
-        title: "Success",
-        description: "Text watermarked successfully",
-      });
+      const formData = new FormData();
+      
+      if (textMode === "generate") {
+        if (!textPrompt.trim()) {
+          toast({ title: "Error", description: "Please enter a prompt", variant: "destructive" });
+          return;
+        }
+        formData.append("prompt", textPrompt);
+        formData.append("max_new_tokens", "60");
+        formData.append("top_k", "50");
+        formData.append("temperature", "1.0");
+        
+        const res = await fetch(`${API_BASE_URL}/text/generate`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setTextResult(data);
+        toast({ title: "Success", description: "Text generated successfully" });
+      } else {
+        if (!textToDetect.trim()) {
+          toast({ title: "Error", description: "Please enter text to detect", variant: "destructive" });
+          return;
+        }
+        formData.append("text", textToDetect);
+        
+        const res = await fetch(`${API_BASE_URL}/text/detect`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setTextResult(data);
+        toast({ title: "Success", description: "Detection completed" });
+      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to watermark text",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to process text", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleImageModelSubmit = async (modelType: string) => {
-    if (!imageFile) {
-      toast({
-        title: "Error",
-        description: "Please upload an image first",
-        variant: "destructive",
-      });
-      return;
+  const handleFreqImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFreqFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setFreqPreview(reader.result as string);
+      reader.readAsDataURL(file);
     }
+  };
 
+  const handleFreqSubmit = async () => {
     setIsLoading(true);
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      setImageOutput(`Image processed with ${modelType} model. Watermark detected/added successfully.`);
-      toast({
-        title: "Success",
-        description: "Image processed successfully",
-      });
+      const formData = new FormData();
+      
+      if (freqMode === "generate") {
+        if (!freqPrompt.trim()) {
+          toast({ title: "Error", description: "Please enter a prompt", variant: "destructive" });
+          return;
+        }
+        formData.append("prompt", freqPrompt);
+        formData.append("method", freqMethod);
+        formData.append("strength", "0.25");
+        
+        const res = await fetch(`${API_BASE_URL}/freq/generate`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setFreqResult(data);
+        toast({ title: "Success", description: "Image generated and watermarked" });
+      } else {
+        if (!freqFile) {
+          toast({ title: "Error", description: "Please upload an image", variant: "destructive" });
+          return;
+        }
+        formData.append("file", freqFile);
+        formData.append("method", freqMethod);
+        
+        const res = await fetch(`${API_BASE_URL}/freq/detect`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setFreqResult(data);
+        toast({ title: "Success", description: "Watermark detection completed" });
+      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to process image",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to process image", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRobustImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setRobustFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setRobustPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRobustSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      
+      if (robustMode === "generate") {
+        if (!robustPrompt.trim()) {
+          toast({ title: "Error", description: "Please enter a prompt", variant: "destructive" });
+          return;
+        }
+        formData.append("prompt", robustPrompt);
+        
+        const res = await fetch(`${API_BASE_URL}/robust/generate`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setRobustResult(data);
+        toast({ title: "Success", description: "Image generated and watermarked" });
+      } else {
+        if (!robustFile) {
+          toast({ title: "Error", description: "Please upload an image", variant: "destructive" });
+          return;
+        }
+        formData.append("file", robustFile);
+        
+        const res = await fetch(`${API_BASE_URL}/robust/detect`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setRobustResult(data);
+        toast({ title: "Success", description: "Watermark detection completed" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to process image", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -128,93 +220,61 @@ const AIWatermarking = () => {
             <TabsContent value="text">
               <Card>
                 <CardHeader>
-                  <CardTitle>Text Model Watermarking</CardTitle>
+                  <CardTitle>Text Model Watermarking (GPT-2)</CardTitle>
                   <CardDescription>
-                    Watermark or detect watermarks in AI-generated text
+                    Generate watermarked text or detect watermarks in existing text
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="text-input">Input Text</Label>
-                    <Textarea
-                      id="text-input"
-                      placeholder="Enter text to watermark or check for watermarks..."
-                      value={textInput}
-                      onChange={(e) => setTextInput(e.target.value)}
-                      rows={8}
-                      className="resize-none"
-                    />
+                    <Label>Mode</Label>
+                    <Select value={textMode} onValueChange={(v: any) => setTextMode(v)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="generate">Generate Watermarked Text</SelectItem>
+                        <SelectItem value="detect">Detect Watermark</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <Button 
-                    onClick={handleTextModelSubmit}
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Process Text
-                  </Button>
-
-                  {textOutput && (
+                  {textMode === "generate" ? (
                     <div className="space-y-2">
-                      <Label>Output</Label>
-                      <div className="p-4 bg-muted rounded-md">
-                        <p className="text-sm text-foreground">{textOutput}</p>
-                      </div>
+                      <Label htmlFor="text-prompt">Prompt</Label>
+                      <Textarea
+                        id="text-prompt"
+                        placeholder="Enter prompt to generate watermarked text..."
+                        value={textPrompt}
+                        onChange={(e) => setTextPrompt(e.target.value)}
+                        rows={4}
+                      />
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Images Tab */}
-            <TabsContent value="closedsource">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Image Watermarking</CardTitle>
-                  <CardDescription>
-                    Watermark and detect watermarks in AI-generated images
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="image-upload-cs">Upload Image</Label>
-                    <Input
-                      id="image-upload-cs"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="cursor-pointer"
-                    />
-                  </div>
-
-                  {imagePreview && (
+                  ) : (
                     <div className="space-y-2">
-                      <Label>Preview</Label>
-                      <div className="border rounded-md p-4 bg-muted">
-                        <img 
-                          src={imagePreview} 
-                          alt="Preview" 
-                          className="max-w-full h-auto max-h-64 mx-auto rounded"
-                        />
-                      </div>
+                      <Label htmlFor="text-detect">Text to Detect</Label>
+                      <Textarea
+                        id="text-detect"
+                        placeholder="Enter text to check for watermarks..."
+                        value={textToDetect}
+                        onChange={(e) => setTextToDetect(e.target.value)}
+                        rows={8}
+                      />
                     </div>
                   )}
 
-                  <Button 
-                    onClick={() => handleImageModelSubmit("Closed Source")}
-                    disabled={isLoading || !imageFile}
-                    className="w-full"
-                  >
+                  <Button onClick={handleTextSubmit} disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Process Image
+                    {textMode === "generate" ? "Generate" : "Detect"}
                   </Button>
 
-                  {imageOutput && (
+                  {textResult && (
                     <div className="space-y-2">
                       <Label>Result</Label>
                       <div className="p-4 bg-muted rounded-md">
-                        <p className="text-sm text-foreground">{imageOutput}</p>
+                        <pre className="text-sm text-foreground whitespace-pre-wrap">
+                          {JSON.stringify(textResult, null, 2)}
+                        </pre>
                       </div>
                     </div>
                   )}
@@ -222,57 +282,171 @@ const AIWatermarking = () => {
               </Card>
             </TabsContent>
 
-            {/* Images - Stronger Tab */}
+            {/* Images Tab (Frequency Domain) */}
+            <TabsContent value="closedsource">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Image Watermarking (Frequency Domain)</CardTitle>
+                  <CardDescription>
+                    Generate watermarked images or detect watermarks using SIFT/DWT/DCT
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label>Mode</Label>
+                    <Select value={freqMode} onValueChange={(v: any) => setFreqMode(v)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="generate">Generate Watermarked Image</SelectItem>
+                        <SelectItem value="detect">Detect Watermark</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Method</Label>
+                    <Select value={freqMethod} onValueChange={setFreqMethod}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sift">SIFT</SelectItem>
+                        <SelectItem value="dwt">DWT</SelectItem>
+                        <SelectItem value="dct">DCT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {freqMode === "generate" ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="freq-prompt">Prompt</Label>
+                      <Input
+                        id="freq-prompt"
+                        placeholder="Enter image prompt..."
+                        value={freqPrompt}
+                        onChange={(e) => setFreqPrompt(e.target.value)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="freq-upload">Upload Image</Label>
+                      <Input
+                        id="freq-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFreqImageUpload}
+                        className="cursor-pointer"
+                      />
+                    </div>
+                  )}
+
+                  {freqPreview && freqMode === "detect" && (
+                    <div className="space-y-2">
+                      <Label>Preview</Label>
+                      <div className="border rounded-md p-4 bg-muted">
+                        <img src={freqPreview} alt="Preview" className="max-w-full h-auto max-h-64 mx-auto rounded" />
+                      </div>
+                    </div>
+                  )}
+
+                  <Button onClick={handleFreqSubmit} disabled={isLoading} className="w-full">
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {freqMode === "generate" ? "Generate" : "Detect"}
+                  </Button>
+
+                  {freqResult && (
+                    <div className="space-y-2">
+                      <Label>Result</Label>
+                      <div className="p-4 bg-muted rounded-md space-y-2">
+                        {freqResult.watermarked_image && (
+                          <img src={`data:image/png;base64,${freqResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded" />
+                        )}
+                        <pre className="text-sm text-foreground whitespace-pre-wrap">
+                          {JSON.stringify(freqResult, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Images - Stronger Tab (Robust) */}
             <TabsContent value="nn">
               <Card className="border-primary">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5" />
                     Image Watermarking - Stronger
                   </CardTitle>
                   <CardDescription>
-                    Advanced neural network watermarking for enhanced detection
+                    Advanced neural network watermarking for enhanced robustness
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="image-upload-nn">Upload Image</Label>
-                    <Input
-                      id="image-upload-nn"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="cursor-pointer"
-                    />
+                    <Label>Mode</Label>
+                    <Select value={robustMode} onValueChange={(v: any) => setRobustMode(v)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="generate">Generate Watermarked Image</SelectItem>
+                        <SelectItem value="detect">Detect Watermark</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  {imagePreview && (
+                  {robustMode === "generate" ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="robust-prompt">Prompt</Label>
+                      <Input
+                        id="robust-prompt"
+                        placeholder="Enter image prompt..."
+                        value={robustPrompt}
+                        onChange={(e) => setRobustPrompt(e.target.value)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="robust-upload">Upload Image</Label>
+                      <Input
+                        id="robust-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleRobustImageUpload}
+                        className="cursor-pointer"
+                      />
+                    </div>
+                  )}
+
+                  {robustPreview && robustMode === "detect" && (
                     <div className="space-y-2">
                       <Label>Preview</Label>
                       <div className="border rounded-md p-4 bg-muted">
-                        <img 
-                          src={imagePreview} 
-                          alt="Preview" 
-                          className="max-w-full h-auto max-h-64 mx-auto rounded"
-                        />
+                        <img src={robustPreview} alt="Preview" className="max-w-full h-auto max-h-64 mx-auto rounded" />
                       </div>
                     </div>
                   )}
 
-                  <Button 
-                    onClick={() => handleImageModelSubmit("Neural Network")}
-                    disabled={isLoading || !imageFile}
-                    className="w-full"
-                  >
+                  <Button onClick={handleRobustSubmit} disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     <Zap className="mr-2 h-4 w-4" />
-                    Process with Advanced NN
+                    {robustMode === "generate" ? "Generate with NN" : "Detect with NN"}
                   </Button>
 
-                  {imageOutput && (
+                  {robustResult && (
                     <div className="space-y-2">
                       <Label>Result</Label>
-                      <div className="p-4 bg-primary/10 border border-primary rounded-md">
-                        <p className="text-sm text-foreground font-medium">{imageOutput}</p>
+                      <div className="p-4 bg-primary/10 border border-primary rounded-md space-y-2">
+                        {robustResult.watermarked_image && (
+                          <img src={`data:image/png;base64,${robustResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded" />
+                        )}
+                        <pre className="text-sm text-foreground font-medium whitespace-pre-wrap">
+                          {JSON.stringify(robustResult, null, 2)}
+                        </pre>
                       </div>
                     </div>
                   )}
