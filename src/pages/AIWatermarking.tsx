@@ -109,22 +109,18 @@ const AIWatermarking = () => {
           </div>
 
           <Tabs defaultValue="text" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="text" className="flex items-center gap-2">
                 <FileText size={16} />
                 <span className="hidden sm:inline">Text Models</span>
               </TabsTrigger>
-              <TabsTrigger value="opensource" className="flex items-center gap-2">
-                <ImageIcon size={16} />
-                <span className="hidden sm:inline">Open Source</span>
-              </TabsTrigger>
               <TabsTrigger value="closedsource" className="flex items-center gap-2">
                 <ImageIcon size={16} />
-                <span className="hidden sm:inline">Closed Source</span>
+                <span className="hidden sm:inline">Images</span>
               </TabsTrigger>
               <TabsTrigger value="nn" className="flex items-center gap-2">
                 <Zap size={16} />
-                <span className="hidden sm:inline">NN Stronger 🔥</span>
+                <span className="hidden sm:inline">Images - Stronger</span>
               </TabsTrigger>
             </TabsList>
 
@@ -171,68 +167,13 @@ const AIWatermarking = () => {
               </Card>
             </TabsContent>
 
-            {/* Open Source Image Models Tab */}
-            <TabsContent value="opensource">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Image Watermarking - Open Source Models</CardTitle>
-                  <CardDescription>
-                    Watermark images using open source models
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="image-upload-os">Upload Image</Label>
-                    <Input
-                      id="image-upload-os"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="cursor-pointer"
-                    />
-                  </div>
-
-                  {imagePreview && (
-                    <div className="space-y-2">
-                      <Label>Preview</Label>
-                      <div className="border rounded-md p-4 bg-muted">
-                        <img 
-                          src={imagePreview} 
-                          alt="Preview" 
-                          className="max-w-full h-auto max-h-64 mx-auto rounded"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <Button 
-                    onClick={() => handleImageModelSubmit("Open Source")}
-                    disabled={isLoading || !imageFile}
-                    className="w-full"
-                  >
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Process Image
-                  </Button>
-
-                  {imageOutput && (
-                    <div className="space-y-2">
-                      <Label>Result</Label>
-                      <div className="p-4 bg-muted rounded-md">
-                        <p className="text-sm text-foreground">{imageOutput}</p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Closed Source Image Models Tab */}
+            {/* Images Tab */}
             <TabsContent value="closedsource">
               <Card>
                 <CardHeader>
-                  <CardTitle>Image Watermarking - Closed Source Models</CardTitle>
+                  <CardTitle>Image Watermarking</CardTitle>
                   <CardDescription>
-                    Watermark images from closed source AI models
+                    Watermark and detect watermarks in AI-generated images
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -281,15 +222,15 @@ const AIWatermarking = () => {
               </Card>
             </TabsContent>
 
-            {/* NN Stronger Image Models Tab */}
+            {/* Images - Stronger Tab */}
             <TabsContent value="nn">
               <Card className="border-primary">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    Image Watermarking - Neural Network (Stronger) 🔥
+                    Image Watermarking - Stronger
                   </CardTitle>
                   <CardDescription>
-                    Advanced neural network watermarking for closed source models
+                    Advanced neural network watermarking for enhanced detection
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
