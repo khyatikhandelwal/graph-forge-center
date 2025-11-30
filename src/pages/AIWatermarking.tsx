@@ -488,7 +488,7 @@ const AIWatermarking = () => {
                     <div className="space-y-2">
                       <Label>Result</Label>
                       <div className="p-4 bg-primary/10 border border-primary rounded-md space-y-4">
-                        {robustResult.unwatermarked_image && robustResult.watermarked_image && (
+                        {robustResult.unwatermarked_image && robustResult.watermarked_image ? (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label className="text-sm">Original Image</Label>
@@ -499,10 +499,79 @@ const AIWatermarking = () => {
                               <img src={`data:image/png;base64,${robustResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded border" />
                             </div>
                           </div>
+                        ) : robustResult.is_watermarked !== undefined ? (
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-3 p-4 bg-background rounded-lg border-2 border-primary">
+                              <span className="text-3xl">{robustResult.is_watermarked ? "✅" : "❌"}</span>
+                              <div>
+                                <p className="font-semibold text-lg">
+                                  {robustResult.is_watermarked ? "Watermark Detected" : "No Watermark Detected"}
+                                </p>
+                                <p className="text-sm text-muted-foreground">Neural Network Detection</p>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div className="p-3 bg-background rounded-lg border border-primary/30">
+                                <p className="text-sm text-muted-foreground mb-1">🎯 Bit Accuracy</p>
+                                <p className="text-xl font-semibold">{(robustResult.bit_accuracy * 100).toFixed(1)}%</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {robustResult.matching_bits}/{robustResult.total_bits} bits matched
+                                </p>
+                              </div>
+                              
+                              <div className="p-3 bg-background rounded-lg border border-primary/30">
+                                <p className="text-sm text-muted-foreground mb-1">💪 Confidence</p>
+                                <p className="text-xl font-semibold">{(robustResult.confidence * 100).toFixed(2)}%</p>
+                              </div>
+                              
+                              <div className="p-3 bg-background rounded-lg border border-primary/30">
+                                <p className="text-sm text-muted-foreground mb-1">📊 P-Value</p>
+                                <p className="text-xl font-semibold">{robustResult.p_value?.toExponential(2)}</p>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div className="p-3 bg-background rounded-lg border border-primary/30">
+                                <p className="text-sm text-muted-foreground mb-1">🧪 Statistical Test</p>
+                                <p className="text-lg font-semibold flex items-center gap-2">
+                                  {robustResult.statistical_test ? "✅ Passed" : "❌ Failed"}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Threshold: {robustResult.threshold_bits} bits (α = {robustResult.significance_level})
+                                </p>
+                              </div>
+                              
+                              <div className="p-3 bg-background rounded-lg border border-primary/30">
+                                <p className="text-sm text-muted-foreground mb-1">🔬 Confidence Test</p>
+                                <p className="text-lg font-semibold flex items-center gap-2">
+                                  {robustResult.confidence_test ? "✅ Passed" : "❌ Failed"}
+                                </p>
+                              </div>
+                            </div>
+
+                            {robustResult.extracted_message && robustResult.expected_message && (
+                              <div className="p-4 bg-background rounded-lg border border-primary/30 space-y-3">
+                                <div>
+                                  <p className="text-sm text-muted-foreground mb-1">🔑 Expected Message</p>
+                                  <code className="text-xs font-mono bg-muted px-2 py-1 rounded block break-all">
+                                    {robustResult.expected_message}
+                                  </code>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground mb-1">🔍 Extracted Message</p>
+                                  <code className="text-xs font-mono bg-muted px-2 py-1 rounded block break-all">
+                                    {robustResult.extracted_message}
+                                  </code>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <pre className="text-sm text-foreground font-medium whitespace-pre-wrap">
+                            {JSON.stringify(robustResult, null, 2)}
+                          </pre>
                         )}
-                        <pre className="text-sm text-foreground font-medium whitespace-pre-wrap">
-                          {JSON.stringify(robustResult, null, 2)}
-                        </pre>
                       </div>
                     </div>
                   )}
