@@ -286,7 +286,10 @@ const AIWatermarking = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Image Watermarking (Frequency Domain)</CardTitle>
-                  <CardDescription>Generate watermarked images or detect watermarks using SIFT/DWT/DCT</CardDescription>
+                  <CardDescription>
+                    Generate watermarked images or detect watermarks using SIFT/DWT/DCT methods. The SIFT method is most
+                    robust to editing, screenshotting, etc.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
