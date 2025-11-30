@@ -438,7 +438,10 @@ const AIWatermarking = () => {
                     <Zap className="h-5 w-5" />
                     Image Watermarking - Stronger
                   </CardTitle>
-                  <CardDescription>Advanced neural network watermarking for enhanced robustness</CardDescription>
+                  <CardDescription>
+                    Advanced neural network watermarking for enhanced robustness. Trained over large datasets. Robust to
+                    screenshotting, edits, etc.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
