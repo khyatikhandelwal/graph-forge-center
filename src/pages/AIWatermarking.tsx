@@ -42,7 +42,7 @@ const AIWatermarking = () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      
+
       if (textMode === "generate") {
         if (!textPrompt.trim()) {
           toast({ title: "Error", description: "Please enter a prompt", variant: "destructive" });
@@ -52,7 +52,7 @@ const AIWatermarking = () => {
         formData.append("max_new_tokens", "60");
         formData.append("top_k", "50");
         formData.append("temperature", "1.0");
-        
+
         const res = await fetch(`${API_BASE_URL}/text/generate`, {
           method: "POST",
           body: formData,
@@ -66,7 +66,7 @@ const AIWatermarking = () => {
           return;
         }
         formData.append("text", textToDetect);
-        
+
         const res = await fetch(`${API_BASE_URL}/text/detect`, {
           method: "POST",
           body: formData,
@@ -96,7 +96,7 @@ const AIWatermarking = () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      
+
       if (freqMode === "generate") {
         if (!freqPrompt.trim()) {
           toast({ title: "Error", description: "Please enter a prompt", variant: "destructive" });
@@ -105,7 +105,7 @@ const AIWatermarking = () => {
         formData.append("prompt", freqPrompt);
         formData.append("method", freqMethod);
         formData.append("strength", "0.25");
-        
+
         const res = await fetch(`${API_BASE_URL}/freq/generate`, {
           method: "POST",
           body: formData,
@@ -120,7 +120,7 @@ const AIWatermarking = () => {
         }
         formData.append("file", freqFile);
         formData.append("method", freqMethod);
-        
+
         const res = await fetch(`${API_BASE_URL}/freq/detect`, {
           method: "POST",
           body: formData,
@@ -150,14 +150,14 @@ const AIWatermarking = () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      
+
       if (robustMode === "generate") {
         if (!robustPrompt.trim()) {
           toast({ title: "Error", description: "Please enter a prompt", variant: "destructive" });
           return;
         }
         formData.append("prompt", robustPrompt);
-        
+
         const res = await fetch(`${API_BASE_URL}/robust/generate`, {
           method: "POST",
           body: formData,
@@ -171,7 +171,7 @@ const AIWatermarking = () => {
           return;
         }
         formData.append("file", robustFile);
-        
+
         const res = await fetch(`${API_BASE_URL}/robust/detect`, {
           method: "POST",
           body: formData,
@@ -190,14 +190,12 @@ const AIWatermarking = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
-      
+
       <main className="flex-1 py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">AI Watermarking</h1>
-            <p className="text-xl text-muted-foreground">
-              Watermark and detect watermarks in AI-generated content
-            </p>
+            <p className="text-xl text-muted-foreground">Watermark and detect watermarks in AI-generated content</p>
           </div>
 
           <Tabs defaultValue="text" className="w-full">
@@ -220,9 +218,10 @@ const AIWatermarking = () => {
             <TabsContent value="text">
               <Card>
                 <CardHeader>
-                  <CardTitle>Text Model Watermarking (GPT-2)</CardTitle>
+                  <CardTitle>Text Model Watermarking (GPT-2 for Demo)</CardTitle>
                   <CardDescription>
-                    Generate watermarked text or detect watermarks in existing text
+                    Generate watermarked text or detect watermarks in existing text outputted by GPT-2 for demo. This
+                    method works with any Open-Source HuggingFace generative model.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -287,9 +286,7 @@ const AIWatermarking = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Image Watermarking (Frequency Domain)</CardTitle>
-                  <CardDescription>
-                    Generate watermarked images or detect watermarks using SIFT/DWT/DCT
-                  </CardDescription>
+                  <CardDescription>Generate watermarked images or detect watermarks using SIFT/DWT/DCT</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
@@ -364,11 +361,19 @@ const AIWatermarking = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label className="text-sm">Original Image</Label>
-                              <img src={`data:image/png;base64,${freqResult.unwatermarked_image}`} alt="Original" className="max-w-full h-auto rounded border" />
+                              <img
+                                src={`data:image/png;base64,${freqResult.unwatermarked_image}`}
+                                alt="Original"
+                                className="max-w-full h-auto rounded border"
+                              />
                             </div>
                             <div className="space-y-2">
                               <Label className="text-sm">Watermarked Image</Label>
-                              <img src={`data:image/png;base64,${freqResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded border" />
+                              <img
+                                src={`data:image/png;base64,${freqResult.watermarked_image}`}
+                                alt="Watermarked"
+                                className="max-w-full h-auto rounded border"
+                              />
                             </div>
                           </div>
                         ) : freqResult.is_watermarked !== undefined ? (
@@ -379,10 +384,12 @@ const AIWatermarking = () => {
                                 <p className="font-semibold text-lg">
                                   {freqResult.is_watermarked ? "Watermark Detected" : "No Watermark Detected"}
                                 </p>
-                                <p className="text-sm text-muted-foreground">Method: {freqResult.method?.toUpperCase()}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Method: {freqResult.method?.toUpperCase()}
+                                </p>
                               </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div className="p-3 bg-background rounded-lg border">
                                 <p className="text-sm text-muted-foreground mb-1">🎯 Bit Accuracy</p>
@@ -391,17 +398,17 @@ const AIWatermarking = () => {
                                   {freqResult.matching_bits}/{freqResult.total_bits} bits matched
                                 </p>
                               </div>
-                              
+
                               <div className="p-3 bg-background rounded-lg border">
                                 <p className="text-sm text-muted-foreground mb-1">📊 Confidence</p>
                                 <p className="text-xl font-semibold">{(freqResult.confidence * 100).toFixed(2)}%</p>
                               </div>
-                              
+
                               <div className="p-3 bg-background rounded-lg border">
                                 <p className="text-sm text-muted-foreground mb-1">🔗 Correlation</p>
                                 <p className="text-xl font-semibold">{freqResult.correlation?.toFixed(4)}</p>
                               </div>
-                              
+
                               <div className="p-3 bg-background rounded-lg border">
                                 <p className="text-sm text-muted-foreground mb-1">📈 P-Value</p>
                                 <p className="text-xl font-semibold">{freqResult.correlation_p_value?.toFixed(4)}</p>
@@ -428,9 +435,7 @@ const AIWatermarking = () => {
                     <Zap className="h-5 w-5" />
                     Image Watermarking - Stronger
                   </CardTitle>
-                  <CardDescription>
-                    Advanced neural network watermarking for enhanced robustness
-                  </CardDescription>
+                  <CardDescription>Advanced neural network watermarking for enhanced robustness</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
@@ -492,11 +497,19 @@ const AIWatermarking = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label className="text-sm">Original Image</Label>
-                              <img src={`data:image/png;base64,${robustResult.unwatermarked_image}`} alt="Original" className="max-w-full h-auto rounded border" />
+                              <img
+                                src={`data:image/png;base64,${robustResult.unwatermarked_image}`}
+                                alt="Original"
+                                className="max-w-full h-auto rounded border"
+                              />
                             </div>
                             <div className="space-y-2">
                               <Label className="text-sm">Watermarked Image</Label>
-                              <img src={`data:image/png;base64,${robustResult.watermarked_image}`} alt="Watermarked" className="max-w-full h-auto rounded border" />
+                              <img
+                                src={`data:image/png;base64,${robustResult.watermarked_image}`}
+                                alt="Watermarked"
+                                className="max-w-full h-auto rounded border"
+                              />
                             </div>
                           </div>
                         ) : robustResult.is_watermarked !== undefined ? (
@@ -510,7 +523,7 @@ const AIWatermarking = () => {
                                 <p className="text-sm text-muted-foreground">Neural Network Detection</p>
                               </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                               <div className="p-3 bg-background rounded-lg border border-primary/30">
                                 <p className="text-sm text-muted-foreground mb-1">🎯 Bit Accuracy</p>
@@ -519,12 +532,12 @@ const AIWatermarking = () => {
                                   {robustResult.matching_bits}/{robustResult.total_bits} bits matched
                                 </p>
                               </div>
-                              
+
                               <div className="p-3 bg-background rounded-lg border border-primary/30">
                                 <p className="text-sm text-muted-foreground mb-1">💪 Confidence</p>
                                 <p className="text-xl font-semibold">{(robustResult.confidence * 100).toFixed(2)}%</p>
                               </div>
-                              
+
                               <div className="p-3 bg-background rounded-lg border border-primary/30">
                                 <p className="text-sm text-muted-foreground mb-1">📊 P-Value</p>
                                 <p className="text-xl font-semibold">{robustResult.p_value?.toExponential(2)}</p>
@@ -541,7 +554,7 @@ const AIWatermarking = () => {
                                   Threshold: {robustResult.threshold_bits} bits (α = {robustResult.significance_level})
                                 </p>
                               </div>
-                              
+
                               <div className="p-3 bg-background rounded-lg border border-primary/30">
                                 <p className="text-sm text-muted-foreground mb-1">🔬 Confidence Test</p>
                                 <p className="text-lg font-semibold flex items-center gap-2">
