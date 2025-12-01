@@ -284,7 +284,9 @@ const AIWatermarking = () => {
                         </Card>
                       )}
 
-                      {textResult.detection && (
+                      {((textMode === "detect" && textResult.status) || textResult.detection) && (() => {
+                        const detectionData = textMode === "detect" ? textResult : textResult.detection;
+                        return (
                         <Card className="bg-muted/50">
                           <CardHeader>
                             <CardTitle className="text-lg">🔍 Detection Results</CardTitle>
@@ -294,75 +296,76 @@ const AIWatermarking = () => {
                               <div className="space-y-2 p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground">Status</p>
                                 <p className={`text-lg font-bold ${
-                                  textResult.detection.status === "WATERMARK DETECTED" 
+                                  detectionData.status === "WATERMARK DETECTED" 
                                     ? "text-green-600 dark:text-green-400" 
                                     : "text-red-600 dark:text-red-400"
                                 }`}>
-                                  {textResult.detection.status === "WATERMARK DETECTED" ? "✅" : "❌"} {textResult.detection.status}
+                                  {detectionData.status === "WATERMARK DETECTED" ? "✅" : "❌"} {detectionData.status}
                                 </p>
                               </div>
 
                               <div className="space-y-2 p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground">Confidence</p>
                                 <p className="text-lg font-bold text-foreground">
-                                  🎯 {(textResult.detection.confidence * 100).toFixed(2)}%
+                                  🎯 {(detectionData.confidence * 100).toFixed(2)}%
                                 </p>
                               </div>
 
                               <div className="space-y-2 p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground">Z-Score</p>
                                 <p className="text-lg font-bold text-foreground">
-                                  📊 {textResult.detection.z?.toFixed(4)}
+                                  📊 {detectionData.z?.toFixed(4)}
                                 </p>
                               </div>
 
                               <div className="space-y-2 p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground">P-Value</p>
                                 <p className="text-lg font-bold text-foreground">
-                                  📈 {textResult.detection.p?.toExponential(4)}
+                                  📈 {detectionData.p?.toExponential(4)}
                                 </p>
                               </div>
 
                               <div className="space-y-2 p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground">Tokens Analyzed</p>
                                 <p className="text-lg font-bold text-foreground">
-                                  🔢 {textResult.detection.T}
+                                  🔢 {detectionData.T}
                                 </p>
                               </div>
 
                               <div className="space-y-2 p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground">Tournament Layers (m)</p>
                                 <p className="text-lg font-bold text-foreground">
-                                  🏆 {textResult.detection.m}
+                                  🏆 {detectionData.m}
                                 </p>
                               </div>
 
                               <div className="space-y-2 p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground">Mean G-Value</p>
                                 <p className="text-lg font-bold text-foreground">
-                                  💫 {textResult.detection.mean_g?.toFixed(4)}
+                                  💫 {detectionData.mean_g?.toFixed(4)}
                                 </p>
                               </div>
                             </div>
 
-                            {textResult.detection.explanation && (
+                            {detectionData.explanation && (
                               <div className="p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground mb-2">💡 Explanation</p>
-                                <p className="text-foreground">{textResult.detection.explanation}</p>
+                                <p className="text-foreground">{detectionData.explanation}</p>
                               </div>
                             )}
 
-                            {textResult.detection.report && (
+                            {detectionData.report && (
                               <div className="p-4 bg-background rounded-lg border">
                                 <p className="text-sm font-medium text-muted-foreground mb-2">📋 Detailed Report</p>
                                 <pre className="text-xs text-foreground whitespace-pre-wrap font-mono">
-                                  {textResult.detection.report}
+                                  {detectionData.report}
                                 </pre>
                               </div>
                             )}
                           </CardContent>
                         </Card>
-                      )}
+                        );
+                      })()}
                     </div>
                   )}
                 </CardContent>
