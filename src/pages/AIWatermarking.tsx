@@ -268,13 +268,101 @@ const AIWatermarking = () => {
                   </Button>
 
                   {textResult && (
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <Label>Result</Label>
-                      <div className="p-4 bg-muted rounded-md">
-                        <pre className="text-sm text-foreground whitespace-pre-wrap">
-                          {JSON.stringify(textResult, null, 2)}
-                        </pre>
-                      </div>
+                      
+                      {textMode === "generate" && textResult.generated_text && (
+                        <Card className="bg-muted/50">
+                          <CardHeader>
+                            <CardTitle className="text-lg">📝 Generated Text</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                              {textResult.generated_text}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {textResult.detection && (
+                        <Card className="bg-muted/50">
+                          <CardHeader>
+                            <CardTitle className="text-lg">🔍 Detection Results</CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2 p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground">Status</p>
+                                <p className={`text-lg font-bold ${
+                                  textResult.detection.status === "WATERMARK DETECTED" 
+                                    ? "text-green-600 dark:text-green-400" 
+                                    : "text-red-600 dark:text-red-400"
+                                }`}>
+                                  {textResult.detection.status === "WATERMARK DETECTED" ? "✅" : "❌"} {textResult.detection.status}
+                                </p>
+                              </div>
+
+                              <div className="space-y-2 p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground">Confidence</p>
+                                <p className="text-lg font-bold text-foreground">
+                                  🎯 {(textResult.detection.confidence * 100).toFixed(2)}%
+                                </p>
+                              </div>
+
+                              <div className="space-y-2 p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground">Z-Score</p>
+                                <p className="text-lg font-bold text-foreground">
+                                  📊 {textResult.detection.z?.toFixed(4)}
+                                </p>
+                              </div>
+
+                              <div className="space-y-2 p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground">P-Value</p>
+                                <p className="text-lg font-bold text-foreground">
+                                  📈 {textResult.detection.p?.toExponential(4)}
+                                </p>
+                              </div>
+
+                              <div className="space-y-2 p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground">Tokens Analyzed</p>
+                                <p className="text-lg font-bold text-foreground">
+                                  🔢 {textResult.detection.T}
+                                </p>
+                              </div>
+
+                              <div className="space-y-2 p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground">Tournament Layers (m)</p>
+                                <p className="text-lg font-bold text-foreground">
+                                  🏆 {textResult.detection.m}
+                                </p>
+                              </div>
+
+                              <div className="space-y-2 p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground">Mean G-Value</p>
+                                <p className="text-lg font-bold text-foreground">
+                                  💫 {textResult.detection.mean_g?.toFixed(4)}
+                                </p>
+                              </div>
+                            </div>
+
+                            {textResult.detection.explanation && (
+                              <div className="p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground mb-2">💡 Explanation</p>
+                                <p className="text-foreground">{textResult.detection.explanation}</p>
+                              </div>
+                            )}
+
+                            {textResult.detection.report && (
+                              <div className="p-4 bg-background rounded-lg border">
+                                <p className="text-sm font-medium text-muted-foreground mb-2">📋 Detailed Report</p>
+                                <pre className="text-xs text-foreground whitespace-pre-wrap font-mono">
+                                  {textResult.detection.report}
+                                </pre>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      )}
                     </div>
                   )}
                 </CardContent>
